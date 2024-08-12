@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "target": "es2017",
+    /* Specify what module code is generated. */
+    "module": "NodeNext",
+    /* Specify how TypeScript looks up a file from a given module specifier. */
+    "moduleResolution": "nodenext"
+  },
+  "include": ["src", "*.d.ts"],
+  "exclude": ["node_modules"]
+}
