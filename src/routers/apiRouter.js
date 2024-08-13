@@ -5,7 +5,6 @@ import { addBaseProps, addBodyToProps, addParamsToProps, addQueryToProps, formBo
 export const createApiRouter = async (config) => {
     const router = express.Router();
     const apiRoutes = await getApiRoutes(config);
-    console.log(apiRoutes);
     router.use(jsonBodyParser);
     router.use(formBodyParser);
     router.use(addBaseProps);
@@ -15,7 +14,6 @@ export const createApiRouter = async (config) => {
     for (const route in apiRoutes) {
         router.all(route, [addParamsToProps, async (req, res) => {
             let body = `404`;
-            console.log('Api route called', route, apiRoutes)
             if (apiRoutes[route]) {
                 body = await apiRoutes[route](res.locals.props);
             }

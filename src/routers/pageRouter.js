@@ -1,6 +1,6 @@
 import express from 'express';
 import { html } from "#html.js";
-import { formBodyParser, addDataToProps, addParamsToProps, jsonBodyParser, addBodyToProps, addBaseProps, addQueryToProps } from './middlewares.js';
+import { formBodyParser, addDataToProps, addParamsToProps, jsonBodyParser, addBodyToProps, addBaseProps, addQueryToProps, upload } from './middlewares.js';
 import fs from 'node:fs';
 
 export const createPageRouter = (config) => {
@@ -9,6 +9,7 @@ export const createPageRouter = (config) => {
     router.use(jsonBodyParser);
     router.use(formBodyParser);
     router.use(addBaseProps);
+    router.use(upload.array('file'));
     router.use(addBodyToProps);
     router.use(addParamsToProps);
     router.use(addQueryToProps);
@@ -32,7 +33,7 @@ export const createPageRouter = (config) => {
                 }
                 else {
                     content.push(devStyles);
-                    content.push(`<div hx-ext="sse" sse-connect="http://localhost:8080/streaming">
+                    content.push(`<div hx-ext="sse" sse-connect="http://localhost:8080/reloader">
                         <div hx-patch="${res.locals.props.path}" hx-trigger="sse:message">${pageHtml}</div>
                     </div>`);
                     body = html(res.locals.props, content.join(''), js, '', Page.state);

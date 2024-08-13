@@ -21,11 +21,11 @@ export const upload = multer({
     storage: memoryStorage,
     limits: { fileSize: 2 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg" || file.mimetype == "image/webp") {
             cb(null, true);
         } else {
             cb(null, false);
-            const err = new Error('Only .png, .jpg and .jpeg format allowed!')
+            const err = new Error('Only .webp, .png, .jpg and .jpeg format allowed!')
             err.name = 'ExtensionError'
             return cb(err);
         }
