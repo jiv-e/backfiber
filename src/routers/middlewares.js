@@ -36,7 +36,6 @@ export const addBaseProps = async (req, res, next) => {
     res.locals.props = {
         method: req.method,
         path: req.originalUrl,
-        meta: { title: "Testisivu" }
     };
     next()
 }
