@@ -1,14 +1,23 @@
 import express from "express";
 import { html } from '#utils.js'
+import fs from 'fs';
+import path from 'path';
 import { createPageRouter } from '#routers/pageRouter.js';
 import { createApiRouter } from '#routers/apiRouter.js';
 
-export const initBackfiber = async (app, config) => {
+let backfiberConfig = {
+  sourceFolder: '/src',
+  routes: [],
+  componentFolder: "/components",
+  styles: ""
+};
+
+const initBackfiber = async (app, config) => {
+  backfiberConfig = config;
   app.use(express.static(import.meta.dirname + "/client"));
-  // Skip.
-  app.use("/site.webmanifest", (req, res) => '');
-  app.use("/favicon*", (req, res) => '');
-  app.use("/apple-touch*", (req, res) => '');
+  config.assetFolders.forEach(folder => {
+    app.use(express.static(process.env.INIT_CWD + folder));
+  });
 
   app.get('/reloader', (req, res) => {
 
@@ -30,4 +39,30 @@ export const initBackfiber = async (app, config) => {
   app.use("/", createPageRouter(config));
 }
 
-export { html };
+const generateStaticSite = async ({ host, config }) => {
+  const outputDir = process.env.INIT_CWD + '/static'; // Directory to save the static files
+  if (fs.existsSync(outputDir)) {
+    fs.rmSync(outputDir, { recursive: true, force: true });
+  }
+  fs.mkdirSync(outputDir);
+  // Copy assets.
+  config.assetFolders.forEach(folder => {
+    fs.cpSync(process.env.INIT_CWD + folder, outputDir, { recursive: true });
+  });
+  for (const routePath of config.routes.map(route => route.path)) {
+    const url = `${host}${routePath}`;
+    const folderPath = path.join(outputDir, routePath);
+    const filePath = path.join(outputDir, routePath === '/' ? 'index.html' : `${routePath}/index.html`);
+
+    try {
+      const response = await fetch(url);
+      fs.mkdirSync(folderPath, { recursive: true })
+      fs.writeFileSync(filePath, await response.text());
+      console.log(`Generated static file: ${filePath}`);
+    } catch (error) {
+      console.error(`Error generating static file for route ${routePath}:`, error);
+    }
+  }
+};
+
+export { html, initBackfiber, generateStaticSite };
